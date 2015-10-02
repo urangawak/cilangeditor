@@ -91,7 +91,7 @@ class Editor extends CI_Controller
 		$lang=$this->input->get('lang');
 		$file=$this->input->get('file');
 		$sec=$this->input->get('section');
-		$this->m_language->deleteLanguageSection($lang,$file,$sec);		
+		$this->m_language->deleteLanguageSection($lang,$file,$sec);
 		redirect(base_url().'editor/getsection?lang='.$lang.'&file='.$file,'refresh');
 	}
 	
