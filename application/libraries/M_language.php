@@ -77,9 +77,10 @@ class M_language{
 			foreach($dpath as $rpath=>$vpath){
 				if(is_file($path.'/'.$vpath)){
 					$ext=pathinfo($path.'/'.$vpath,PATHINFO_EXTENSION);
-					if($ext=="php"){
+					$prefCheck=substr($vpath,-9,9);
+					if($ext=="php" && $prefCheck==$prefix){
 						$fLang=str_replace($prefix,"",$vpath);
-						$output[]=$fLang;
+						$output[]=$fLang;						
 					}
 				}
 			}
@@ -396,7 +397,7 @@ class M_language{
  * @param  [type] $newlang  [description]
  * @return [type]           [description]
  */
-	function copyAllLanguage($language,$newlang){
+	function copyAllLanguage($language,$newlang,$langID){
 		$path=APPPATH.'language/'.$language;
 		if(is_dir($path)){
 			$this->CI->load->helper('file');
@@ -404,17 +405,38 @@ class M_language{
 			$dpath=array_diff($proses, array('.', '..'));
 			$output=array();
 			$prefix="_lang.php";
-			$this->newLanguage($newlang);
+			$this->newLanguage(strtolower($newlang));
 			$pathnew=APPPATH.'language/'.$newlang;
-			foreach($dpath as $rpath=>$vpath){
-				if(is_file($path.'/'.$vpath)){
-					$ext=pathinfo($path.'/'.$vpath,PATHINFO_EXTENSION);
-					if($ext=="php"){
-						$content=read_file($path.'/'.$vpath);
-						write_file($pathnew.'/'.$vpath,$content);
-					}
+			$dLastLang=$this->getAllLanguageFile($language);
+			$metainfo=$this->metaInfo($language);
+			$metaID=$metainfo['langid'];
+			foreach($dLastLang as $rLastLang){
+				$houtput='';
+				$dLastSection=$this->getAllLanguageSection($language,$rLastLang);
+				$houtput.='<?php '."\n";
+				$houtput.="defined('BASEPATH') OR exit('No direct script access allowed'); \n";
+				foreach($dLastSection as $rLastSection){
+					$vTran=$this->translateText('bing',$rLastSection->value,$metaID,$langID);					
+					$houtput.='$'."lang['".$rLastSection->key."']=".'"'.$vTran.'";'."\n";					
 				}
+				$houtput.="\n ?>";
+				write_file($pathnew.'/'.$rLastLang.'_lang.php',$houtput);
 			}
+			
+			$langSource=$this->metaInfo($language);
+			$langSourceID=$langSource['langid'];
+			$metaoutput='';
+			$metaoutput.='<?php '."\n";
+			$metaoutput.="defined('BASEPATH') OR exit('No direct script access allowed'); \n";
+			$metaoutput.='$'."info['langid']=".'"'.$langID.'";';
+			$metaoutput.="\n";
+			$metaoutput.='$'."info['langidsource']=".'"'.$langSourceID.'";';
+			$metaoutput.="\n";
+			$metaoutput.='$'."info['langname']=".'"'.$newlang.'";';			
+			$metaoutput.="\n";
+			$metaoutput.='?>';
+			write_file($pathnew.'/metainfo.php',$metaoutput);
+						
 			return true;
 		}else{
 			return false;
@@ -455,6 +477,58 @@ class M_language{
 				return false;
 			}
 
+		}
+	}
+	
+	function metaInfo($language){		
+		$path=APPPATH.'language/'.$language.'/metainfo.php';
+		if(is_file($path)){
+			require $path;
+			if(!empty($info)){
+				return $info;
+			}else{
+				return "";
+			}
+
+		}
+	}
+	
+	function transServiceIcon($str,$targetID){
+		$path=APPPATH.'libraries/translator';
+		$proses=scandir($path);
+		$dpath=array_diff($proses, array('.', '..'));
+		$output=array();
+		foreach($dpath as $rpath=>$vpath){
+			$noprefix=str_replace("_translator.php","",$vpath);
+			$ext=pathinfo($path.'/'.$vpath,PATHINFO_EXTENSION);
+			if($ext=="php"){
+				$output[]=array(
+				'img'=>strtolower($noprefix).'.jpg',
+				'id'=>$noprefix,
+				);
+			}			
+		}
+		$img='';
+		foreach($output as $rh){
+			$enc=base64_encode(file_get_contents($path.'/'.$rh['img']));
+			$type=pathinfo($path.'/'.$rh['img'],PATHINFO_EXTENSION);
+			$sid=strtolower($rh['id']);
+			$param="'$sid','$str','$targetID'";
+			$img.='<a href="javascript:;" onclick="javascript:getTranslate('.$param.');"><img src="data:image/'.$type.';base64,'.$enc.'" style="width:48px;"/></a>';
+		}
+		return $img;
+	}
+	
+	function translateText($service,$str,$from,$to){
+		$path=APPPATH.'libraries/translator/'.$service."_translator.php";
+		
+		if(is_file($path)){
+			//require $path;
+			$this->CI->load->library('translator/'.$service.'_translator');
+			$className=$service."_translator";
+			$sv=new $className();
+			$item=$sv->getTranslateText($from,$to,$str);
+			return $item;
 		}
 	}
 
