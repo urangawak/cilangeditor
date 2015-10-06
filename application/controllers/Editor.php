@@ -31,7 +31,8 @@ class Editor extends CI_Controller
 	function copyas(){
 		$lang=$this->input->post('lang');
 		$newlang=$this->input->post('newlang');
-		$this->m_language->copyAllLanguage($lang,$newlang);
+		$newlangID=$this->input->post('newlangID');
+		$this->m_language->copyAllLanguage($lang,$newlang,$newlangID);
 		redirect(base_url().'editor/getlang?lang='.$newlang,'refresh');
 	}
 	
@@ -73,7 +74,8 @@ class Editor extends CI_Controller
     	$d['lang']=$this->input->get('lang');
     	$this->load->view('header');
     	$d['file']=$this->input->get('file');
-    	
+    	$metainfo=$this->m_language->metaInfo($d['lang']);
+    	$d['langid']=$metainfo['langid'];
 		$this->load->view('section',$d);
 		$this->load->view('footer');
 	}
@@ -106,6 +108,34 @@ class Editor extends CI_Controller
 		$file=$this->input->post('file');
 		$this->m_language->newLanguageFile($lang,$file);
 		redirect(base_url().'editor/getlang?lang='.$lang,'refresh');
+	}
+	
+	function translate(){
+		$service=$this->input->get('service');
+		$dirlang=$this->input->get('dirlang');
+		$str=$this->input->get('str');
+		$from=$this->input->get('fromlang');
+		$to=$this->input->get('tolang');		
+		$item= $this->m_language->translateText($service,$str,$from);
+		$output=array();
+		if(!empty($item)){
+			$output=array(
+			'from'=>$from,
+			'to'=>$to,
+			'oriLang'=>$str,
+			'trLang'=>$item,
+			'status'=>'ok',
+			);
+		}else{
+			$output=array(
+			'from'=>$from,
+			'to'=>$to,
+			'oriLang'=>$str,
+			'trLang'=>"",
+			'status'=>'no',
+			);
+		}
+		echo json_encode($output);
 	}
     
 }

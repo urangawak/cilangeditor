@@ -33,11 +33,15 @@
 		$langV=$this->input->get('lang');
 		$fileV=$this->input->get('file');
 		if(!empty($langV)){
+			$metainfo=$this->m_language->metaInfo($langV);
+			$metaoutput='<strong>Lang ID : '.$metainfo['langid'].'</strong><br>';
 			if(!empty($fileV)){
-				echo '<h4>Bahasa : '.strtoupper($langV).' , File : '.strtoupper($fileV).'</h4>';
+				echo '<h4>Bahasa : '.strtoupper($langV).' , File : '.strtoupper($fileV).'</h4>';				
 			}else{
 				echo '<h4>Bahasa : '.strtoupper($langV).'</h4>';
 			}
+			echo $metaoutput;
 			
-		}
+		}		
+		
 		?>

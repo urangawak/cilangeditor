@@ -71,16 +71,19 @@ echo form_open(base_url().'editor/saveall');
 <tbody>
 <?php
 if(!empty($d)){
+	$i=0;
 foreach($d as $r){
-	
+	$i+=1;
 	?>
 	<tr>
 		<td><?=ucfirst($r->key);?></td>
 		<td>
-			<textarea class="form-control" name="klang[<?=$r->key;?>]"><?=$r->value;?></textarea>			
+			<textarea class="form-control" name="klang[<?=$r->key;?>]" id="trans<?=$i;?>"><?=$r->value;?></textarea>
 		</td>
 		<td width="5%">
 			<a onclick="return confirm('Yakin ingin menghapus item ini?');" href="<?=base_url();?>editor/delsection?lang=<?=$lang;?>&file=<?=$file;?>&section=<?=$r->key;?>" class="btn btn-sm btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
+			<?php			
+			?>
 		</td>
 	</tr>	
 	<?php
@@ -94,3 +97,21 @@ foreach($d as $r){
 <?php
 echo form_close();
 ?>
+<script>
+function getTranslate(sev,str,target){
+	$.ajax({
+		type:'get',
+		dataType:'json',
+		url:'<?=base_url();?>editor/translate',
+		data:'dirlang=<?=$lang;?>&service='+sev+'&str='+str+'&fromlang=<?=$langid;?>&tolang=en',
+		beforeSend:function(){
+		},
+		success:function(x){
+			if(x.status=="ok"){
+				$("#"+target).text(x.trLang);
+				//alert(x.trLang);			
+			}
+		},
+	});
+}
+</script>

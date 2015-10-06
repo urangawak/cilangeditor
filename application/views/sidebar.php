@@ -28,6 +28,10 @@ $(".copyas").each(function(){
       <label>Bahasa Baru</label>
       <div class="form-group">
       <input type="text" name="newlang" class="form-control" required=""/>
+      </div>      
+      <label>Kode Bahasa</label>
+      <div class="form-group">
+      <input type="text" name="newlangID" class="form-control" required="" placeholder="Ex. id,en,de"/>
       </div>
       <button type="submit" class="btn btn-primary btn-md">Duplikasi</button>
       <?php
