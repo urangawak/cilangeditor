@@ -3,6 +3,10 @@
 <li>PHP 5.4</li>
 <li>Codeigniter 3.x</li>
 
+<b>Update</b>
+- Bing Translator Support saat copy paste dari bahasa ke bahasa lain
+Untuk mendapatkan Client ID dan Secret Key dari Bing silahkan kunjungi http://www.microsoft.com/en-us/translator/getstarted.aspx
+
 <b>Language Path : application/language</b><br/>
 
 <b>Usage :</b><br/>
@@ -63,10 +67,11 @@ $this->m_language->saveLanguage("indonesia","system",$arr);
 
 <b>9. Save section (multiple section)</b><br/>
 You can create more input html
-<code>
-<input type="text" name="sec[title]" value="Judul"/>
-<input type="text" name="sec[user]" value="Pengguna"/>
-<input type="text" name="sec[pass]" value="Kata Kunci"/>
+
+input type="text" name="sec[title]" value="Judul"
+
+input type="text" name="sec[user]" value="Pengguna"
+
+input type="text" name="sec[pass]" value="Kata Kunci"
 
 $this->m_language->saveLanguage("indonesia","system",$_POST['sec']);
-</code>
